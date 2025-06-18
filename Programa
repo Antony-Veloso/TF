@@ -2,9 +2,6 @@ import java.util.Random;
 import java.util.Scanner;
 public class TF
 {
-    //
-    // Mostra o conteúdo da matriz de caracteres na saída de console
-    //
     public static void MostraMatriz(char[][] M, int linhas, int colunas)
     {
         for(int L=0; L<linhas; L++)
@@ -17,23 +14,39 @@ public class TF
         }
     }
     
-    //
-    // Retorna o valor absoluto (sem sinal) do número informado.
-    //
     public static double Modulo(int valor)
     {
         return Math.sqrt(valor * valor);
     }
     
+        public static boolean pontoRepetido(int[][] coord, int quantidade, int x, int y) {
+        for (int i = 0; i < quantidade; i++) {
+            if (coord[i][0] == x && coord[i][1] == y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static int[] sorteiaPontoUnico(int colunas, int linhas, int[][] coord, int quantidade) {
+        Random rd = new Random();
+        int x,y;
+
+        do {
+            x = rd.nextInt(colunas);
+            y = rd.nextInt(linhas);
+        } while (pontoRepetido(coord, quantidade, x, y));
+        int[] a={x,y};
+        return a;
+    }
     
         public static void Caminho(char[][] M, int POx, int POy, int PDx, int PDy, char simbolo) {
         double DistY = Modulo(POy - PDy);
         double DistX = Modulo(POx - PDx);
         double Dist = DistX + DistY;
-        double DeslY = DistY / Dist;  // calcula o deslocamento necessário no eixo Y a cada iteracao
-        double DeslX = DistX / Dist;  // calcula o deslocamento necessário no eixo X a cada iteracao
+        double DeslY = DistY / Dist; 
+        double DeslX = DistX / Dist;  
         
-        // coordenadas a serem utilizadas como ponto de partida
         double PosY = POy; 
         double PosX = POx;
 
@@ -43,35 +56,29 @@ public class TF
             //System.out.printf("DeslY: %f ::: DeslX: %f\nPosY: %f ::: PosX: %f\n\n", DeslY, DeslX, PosY, PosX);
             M[(int)PosY][(int)PosX] = simbolo;
             
-            //
-            // decide por incrementar ou decrementar os deslocamentos,
-            // dependendo das posicoes relativas dos pontos de Origem
-            // e de Destino. Para colunas iguais ou linhas iguais, 
-            // o deslocamento será de zero na coordenada.
-            //
-            if(PDy > POy) // linha de destino esta abaixo da de origem?
+            if(PDy > POy) 
             {
                 PosY += DeslY;    
-            } else if(PDy < POy) // linha de destino esta acima da de origem?
+            } else if(PDy < POy) 
             {
                 PosY -= DeslY;    
             }
 
-            if(PDx > POx) // coluna de destino esta a direita da de origem?
+            if(PDx > POx) 
             {
                 PosX += DeslX;    
-            } else if(PDx < POx) // coluna de destino esta a esquerda da de origem?
+            } else if(PDx < POx) 
             {
                 PosX -= DeslX;    
             }            
 
         }
+        M[PDy][PDx] = simbolo;
     }
     
     public static void main(String[] args)
     {
         Scanner sc = new Scanner(System.in);
-        Random rd = new Random();
         int Linhas, Colunas;
         do {
             System.out.print("Informe a quantidade de linhas (>= 3): ");
@@ -85,7 +92,6 @@ public class TF
         
         char[][] M = new char[Linhas][Colunas];
         
-        // popula a matriz com pontos
         for(int L=0; L<Linhas; L++)
         {
             for(int C=0; C<Colunas; C++)
@@ -94,43 +100,28 @@ public class TF
             }
         }
 
-        int Ax, Ay, Bx, By, Cx, Cy, Dx, Dy;
+        char[] letras = {'A', 'B', 'C', 'D'};
+        int[][] coordenadas = new int[4][2];
 
-        Ax = rd.nextInt(Colunas);
-        Ay = rd.nextInt(Linhas);
+        for (int i = 0; i < 4; i++) {
+            int[] p = sorteiaPontoUnico(Colunas, Linhas, coordenadas, i);
+            coordenadas[i][0] = p[0]; // x
+            coordenadas[i][1] = p[1]; // y
+        }
 
-        do {
-            Bx = rd.nextInt(Colunas);
-            By = rd.nextInt(Linhas);
-        } while (Bx == Ax && By == Ay);
+        for (int i = 0; i < 4; i++) {
+            System.out.printf("::: Ponto %c: L=%d, C=%d\n", letras[i], coordenadas[i][1], coordenadas[i][0]);
+        }
 
-        do {
-            Cx = rd.nextInt(Colunas);
-            Cy = rd.nextInt(Linhas);
-        } while ((Cx == Ax && Cy == Ay) || (Cx == Bx && Cy == By));
-
-        do {
-            Dx = rd.nextInt(Colunas);
-            Dy = rd.nextInt(Linhas);
-        } while (Dx == Ax && Dy == Ay ||Dx == Bx && Dy == By || Dx == Cx && Dy == Cy);
-        
-        System.out.printf("::: Ponto A: L=%d, C=%d\n", Ay, Ax);
-        System.out.printf("::: Ponto B: L=%d, C=%d\n", By, Bx);
-        System.out.printf("::: Ponto C: L=%d, C=%d\n", Cy, Cx);
-        System.out.printf("::: Ponto D: L=%d, C=%d\n", Dy, Dx);
         System.out.println("::: >>> Nenhum ponto com coordenadas repetidas! <<<");
 
-        // Desenha os caminhos
-        Caminho(M, Ax, Ay, Bx, By, '+');
-        Caminho(M, Cx, Cy, Dx, Dy, '*');
+        Caminho(M, coordenadas[0][0], coordenadas[0][1], coordenadas[1][0], coordenadas[1][1], '+');
+        Caminho(M, coordenadas[2][0], coordenadas[2][1], coordenadas[3][0], coordenadas[3][1], '*');
+
+        for (int i = 0; i < 4; i++) {
+            M[coordenadas[i][1]][coordenadas[i][0]] = letras[i];
+        }
         
-        // Marca os pontos
-        M[Ay][Ax] = 'A';
-        M[By][Bx] = 'B';
-        M[Cy][Cx] = 'C';
-        M[Dy][Dx] = 'D';
-        
-        // Mostra a matriz resultante no console
         MostraMatriz(M, Linhas, Colunas);
         
     }    
