@@ -54,8 +54,8 @@ public class TF
         {
             // informacoes para depuracao
             //System.out.printf("DeslY: %f ::: DeslX: %f\nPosY: %f ::: PosX: %f\n\n", DeslY, DeslX, PosY, PosX);
-            M[(int)PosY][(int)PosX] = simbolo;
-            
+            if(M[(int)PosY][(int)PosX]=='.'){M[(int)PosY][(int)PosX] = simbolo;}
+            else if((M[(int)PosY][(int)PosX]!='.')&&(M[(int)PosY][(int)PosX]!=simbolo)){M[(int)PosY][(int)PosX] = '#';}
             if(PDy > POy) 
             {
                 PosY += DeslY;    
